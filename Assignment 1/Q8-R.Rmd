@@ -1,0 +1,123 @@
+---
+title: "R Notebook"
+author: "Fatemeh Nadi"
+date: "Nov 2022"
+output: html_document
+---
+
+# 8 - (R)
+  
+
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+theme_set(theme_minimal(20))
+```
+## <b> a. </b>
+```{r}
+?diamonds
+head(diamonds)
+str(diamonds)
+```
+
+A dataset containing the prices and other attributes of almost 54,000 diamonds.
+
+* price   : int, price in US dollars (\$326–\$18,823).
+* carat   : num, weight of the diamond (0.2–5.01).
+* cut     : Ord.factor, quality of the cut (Fair, Good, Very Good, Premium, Ideal).
+* color   : Ord.factor, diamond colour, from D (best) to J (worst).
+* clarity : Ord.factor, a measurement of how clear the diamond is (I1 (worst), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (best)).
+* x       : num, length in mm (0–10.74).
+* y       : num, width in mm (0–58.9).
+* z       : num, depth in mm (0–31.8).
+* depth   : num, total depth percentage = z / mean(x, y) = 2 * z / (x + y) (43–79).
+
+
+
+## <b> b. </b>
+
+```{r}
+barplot(table(diamonds$clarity), 
+        main="The number of diamonds in each clarity group",
+        xlab="clarity", 
+        ylab="number of diamonds",
+        )
+
+```
+
+
+
+
+## <b> c. </b>
+
+> Its right skewed
+
+```{r}
+hist(diamonds$price, main="Diamonds' price in US dollars Histogram", 
+     xlab="price $", ylab="Occurances")
+
+```
+
+
+
+
+## <b> d. </b>
+
+```{r}
+gp <- unique(diamonds$clarity)
+
+SI2 <- diamonds$price[which(diamonds$clarity==gp[1])]
+SI1 <- diamonds$price[which(diamonds$clarity==gp[2])]
+VS1 <- diamonds$price[which(diamonds$clarity==gp[3])]
+VS2 <- diamonds$price[which(diamonds$clarity==gp[4])]
+VVS2 <- diamonds$price[which(diamonds$clarity==gp[5])]
+VVS1 <- diamonds$price[which(diamonds$clarity==gp[6])]
+I1 <- diamonds$price[which(diamonds$clarity==gp[7])]
+IF <- diamonds$price[which(diamonds$clarity==gp[8])]
+
+boxplot(SI2, SI1, VS1, VS2, VVS2, VVS1, I1, IF, main="Price  of each clarity", ylab="price ($)", xlab="Clarity", names=gp)
+```
+\newline
+
+The distance between Q3 and Q1 is known as the interquartile range (IQR) and plays a major part in how long the whiskers extending from the box are. Each whisker extends to the furthest data point in each wing that is within 1.5 times the IQR. Any data point further than that distance is considered an outlier, and is marked with a white circles on the diagram.
+
+<b>Most outliers are high-priced diamonds. </b>
+
+All groups have a lot of outliers because, basically, the distribution price is like income, and it has a big skew to the right.
+Among the groups, groups IF and  VVS1 have the most outliers, and group I1 has the least.
+
+
+
+
+\newline
+
+
+
+
+
+## <b> e. </b>
+
+```{r}
+x <- table(diamonds$color)
+piepercent<- round(100*x/sum(x), 1)
+labels <- unique(diamonds$color)
+
+pie(x, labels = piepercent, main = "City pie chart",col = rainbow(length(x)))
+legend("topright", c("E","I","J","H","F","G", "D"),
+   fill = rainbow(length(x)))
+
+
+```
+
+
+
+## <b> f. </b>
+```{r}
+plot(diamonds$depth, diamonds$price, main="Relationship between depth and price of diamonds", xlab="depth percentage", ylab="price in US dollars")
+
+```
+
+Most of the diamonds have a depth of 55 to 70. There are a few diamonds in the outliers, three diamonds with a depth of less than 45 and two diamonds with a depth of more than 75, all of which have a low price.
+There is no relationship between these two variables, and it has a distribution similar to a normal distribution.
+

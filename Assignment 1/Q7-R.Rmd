@@ -1,0 +1,133 @@
+---
+title: "R Notebook"
+author: "Fatemeh Nadi"
+date: "Nov 2022"
+output: html_document
+---
+
+# 7 - (R)
+  
+
+
+```{r setup, include=FALSE}
+
+scores_day <- c(99,56,78,55.5,32,90,80,81,56,59,45,77,84.5,84,70,72,68,32,79,90)
+scores_evening <- c(98,78,68,83,81,89,88,76,65,45,98,90,80,84.5,85,79,78,98,90,79,81,25.5)
+
+
+#knitr::opts_chunk$set(echo = TRUE)
+```
+
+## <b> a. </b>
+* <b> the day class </b>
+
+```{r}
+cat(sprintf("the smallest value : %.2f
+the largest value : %.2f
+the median value : %.2f
+the first quartile : %.2f
+the third quartile : %.2f",
+min(scores_day), 
+max(scores_day),
+median(scores_day),
+quantile(scores_day, 0.25),
+quantile(scores_day, 0.75)))
+```
+
+* <b> the night class </b>
+
+```{r}
+cat(sprintf("the smallest value : %.2f
+the largest value : %.2f
+the median value : %.2f
+the first quartile : %.2f
+the third quartile : %.2f",
+min(scores_evening), 
+max(scores_evening),
+median(scores_evening),
+quantile(scores_evening, 0.25),
+quantile(scores_evening, 0.75)))
+```
+
+## <b> b. </b>
+I take any observations that are more than 1.5 IQR below Q1 or more than 1.5 IQR above Q3 are considered outliers.
+
+\newline
+* <b> outliers for the day class </b>
+```{r}
+q1 <- quantile(scores_day, 0.25)
+q3 <- quantile(scores_day, 0.75)
+iqr <- IQR(scores_day)
+
+Tmin = q1 - 1.5*iqr
+Tmax = q3 + 1.5*iqr
+outliers <- scores_day[which(scores_day < Tmin | scores_day > Tmax)]
+
+if (identical(outliers,numeric(0))) {
+print("No outliers")
+} else {
+print(outliers)
+}
+
+```
+
+* <b> outliers for the night class </b>
+```{r}
+q1 <- quantile(scores_evening, 0.25)
+q3 <- quantile(scores_evening, 0.75)
+iqr <- IQR(scores_evening)
+
+Tmin = q1 - 1.5*iqr
+Tmax = q3 + 1.5*iqr
+outliers <- scores_evening[which(scores_evening < Tmin | scores_evening > Tmax)]
+
+if (identical(outliers,numeric(0))) {
+print("No outliers")
+} else {
+print(outliers)
+}
+
+```
+
+## <b> c. </b>
+It is better to delete only when you have a valid reason.
+For example, when we have noise in the datasets, and that information destroys our results or maybe distorts statistical analyses,  
+might think that it’s best to remove them from our data. 
+But that’s not always the case. Removing outliers is legitimate only for specific reasons.
+But some outliers can be very informative about the population and data collection process. Those can represent natural variations in the people and should remain as they are in our data set. 
+For a more detailed examination, and in some studies, examining these outliers provides valuable information.
+Understanding how outliers occur and whether they might happen again as a normal part of the process or study area.
+
+## <b> d. </b>
+
+```{r}
+boxplot(scores_day, scores_evening,
+main = "Test scores for college",
+names = c("day", "night"),
+xlab = "score",
+horizontal = TRUE
+)
+
+```
+\newline
+
+* <b> i. </b>
+
+\newline
+Day class: mean is smaller than the median because we have a Negative (left) skew.
+
+\newline
+Night class: mean is smaller than the median because we have a Negative (left) skew.
+\newline
+
+* <b> ii. </b>
+
+The IQR for the first data set is greater than the IQR for the second set. 
+so The first data set has the widest spread for the middle 50% of the data.
+meaning : There is more variation in the middle 50% of the first data set.
+
+
+
+
+
+
