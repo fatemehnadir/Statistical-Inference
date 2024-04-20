@@ -1,0 +1,155 @@
+---
+title: "R Notebook"
+author: "Fatemeh Nadi"
+date: "Nov 2022"
+output: html_document
+---
+
+# 9 - (R)
+  
+
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(ggmosaic)
+library(tidyverse)
+theme_set(theme_minimal(20))
+
+heart <- read.csv('./Heart.csv')
+head(heart)
+```
+
+
+## <b> a. </b>
+<b> plot histogram </b>
+
+```{r}
+
+heart <- data.frame(heart)
+
+ggplot(heart, aes(x = age)) + 
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "#F7D302",
+                   bins = round((max(heart$age)-min(heart$age))/2)+1) +
+    labs(
+        title = "Histogram and Density of Age",
+        caption = "Dashed lines show the 2.5% and the 97.5% percentiles on the diagram.",
+        x = "Age",
+        y = "Count"
+    ) +
+    geom_density(color = "#631919", size = 1) +
+    geom_vline(aes(xintercept = quantile(age,.025)), linetype = "dashed", size = 1) +
+    geom_vline(aes(xintercept = quantile(age,1-.025)), linetype = "dashed", size = 1) +
+    theme_classic() +
+    theme(
+      plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
+      plot.caption = element_text(face = "italic")
+    )
+
+```
+
+
+
+## <b> b. </b>
+
+```{r}
+heart$sex <- as.factor(heart$sex) #set sex as categorical variable
+
+qplot(sample = thalch, data = heart , color = sex ,shape = sex) +
+  labs(title="QQ-plot of Maximum heart rate achieved for each gender") +
+  theme(
+    plot.title = element_text( size = 12, face = "bold", hjust = 0.5),  #change title font size, bold and center
+    panel.grid.major = element_blank(),         #remove grid
+    panel.grid.minor = element_blank(),         #remove grid
+    axis.line = element_line(colour = "black"), #set border lines
+    legend.title = element_text(size=12),       #change legend title font size
+    legend.text = element_text(size=10)         #change legend text font size
+    ) +
+  guides(color = guide_legend(title = "gender")) +
+  guides(shape = guide_legend(title = "gender")) +
+  scale_shape_manual(values = c(20, 4)) +       #set shape of each groups
+  stat_qq() +   #fit line
+  stat_qq_line()
+```
+
+## <b> c. </b>
+
+```{r}
+# sorting origin
+heart_sorted =  as.data.frame(sort(table(heart$origin)))
+
+ggplot(heart_sorted) +
+  geom_col(aes(Var1,Freq, fill = Var1)) +
+  coord_flip() + 
+  xlab('Origin') + 
+  ylab('Count') + 
+  ggtitle("Horizontal Bar Plot of Origin") +
+  theme_bw() +
+  theme(legend.position = "none",
+        plot.title = element_text( face = "bold", hjust = 0.5))
+  
+```
+
+
+## <b> d. </b>
+
+```{r}
+
+ggplot(heart, aes(x=cp, y=trestbps, fill=cp)) + 
+  geom_boxplot() + 
+  xlab('chest pain type') + 
+  ylab('resting blood pressure') + 
+  ggtitle("Boxplots of resting blood pressure") +
+  theme_gray() +
+  theme(legend.position = "none",
+          plot.title = element_text( face = "bold", hjust = 0.5))
+
+```
+
+## <b> e. </b>
+
+```{r}
+
+#preprocess
+heart <- heart[!(is.na(heart$exang) | heart$exang=="") ,]
+heart <- heart[!(is.na(heart$restecg) | heart$restecg=="") ,]
+
+#primary mosaic plot
+p <- ggplot(data = heart) +
+  geom_mosaic(aes(x = product(restecg), fill = exang))
+
+```
+
+```{r}
+# heart_sumerice contains percentages of each restecg
+heart_sumerice <- heart %>% 
+  count(exang,restecg) %>% 
+  group_by(restecg) %>% 
+  mutate(percentage = prop.table(n));
+
+# 
+p_label <- ggplot_build(p)$data %>% as.data.frame() %>% filter(.wt > 0)
+p_label$percentage = heart_sumerice$percentage
+
+```
+
+
+```{r}
+p + 
+  geom_text(data = p_label, 
+              aes(x = (xmin + xmax)/2, 
+                  y = (ymin + ymax)/2, 
+                  label = scales::percent((percentage))),
+              position = "identity",
+              check_overlap = TRUE) +
+  ggtitle("Mosaic plot of \nResting electrocardiographic results & Exercise-induced angina") +
+  xlab("resting electrocardiographic results") +
+  ylab("Proportion") +
+  theme_grey() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+
+
+
+
