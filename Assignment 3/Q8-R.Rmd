@@ -1,0 +1,158 @@
+---
+title: "R Notebook"
+author: "Fatemeh Nadi"
+date: "Nov 2022"
+output: html_document
+---
+
+# 8 - (R)
+  
+
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(ggmosaic)
+library(tidyverse)
+theme_set(theme_minimal(20))
+
+```
+
+
+
+<b> read data </b>
+
+```{r}
+
+# Read CSV into DataFrame
+galton = read.csv('./Galton.csv')
+summary(galton)
+length((galton$child))
+```
+
+
+Use the height of the children:
+
+## <b> a. </b>
+```{r}
+k = 0
+mu = mean(galton$child)
+times = 2000
+
+# seq(1, times, by=1)
+for (i in 1:times) {
+  
+  n = 60
+  #reads the dataset 'galton' and take the 60 rows as sample
+  sdf<- sample(1:nrow(galton), n)
+  
+  #sample 60 rows
+  sub_galton <- galton[sdf,]
+  
+  sub_galton.mean = mean(sub_galton$child)
+  
+  ci = 0.97
+  z = qnorm((1-ci)/2)
+  
+  se <- sd(sub_galton$child) / sqrt(n) #SE = s/sqrt(n)
+  
+  lower <- sub_galton.mean + z * se
+  upper <- sub_galton.mean - z * se
+  
+  if (mu>= lower &mu<=upper){
+    k = k+1
+  }
+}
+print((k/times)*100)
+```
+
+
+## <b> b. </b>
+```{r}
+k = 0
+mu = mean(galton$child)
+times = 1000
+# seq(1, times, by=1)
+for (i in 1:times) {
+  
+  n = 10
+  #reads the dataset 'galton' and take the 10 rows as sample
+  sdf<- sample(1:nrow(galton), n)
+  
+  #sample 10 rows
+  sub_galton <- galton[sdf,]
+  
+  sub_galton.mean = mean(sub_galton$child)
+  
+  ci = 0.9
+  z = qnorm((1-ci)/2)
+  
+  se <- sd(sub_galton$child) / sqrt(n) #SE = s/sqrt(n)
+  
+  lower <- sub_galton.mean + z * se
+  upper <- sub_galton.mean - z * se
+  
+  if (mu>= lower &mu<=upper){
+    k = k+1
+  }
+}
+print((k/times)*100)
+```
+
+
+
+## <b> c. </b>
+```{r}
+n = 70
+sdf<- sample(1:nrow(galton), n)
+sub_galton <- galton[sdf,]
+
+z <- (mean(sub_galton$parent)-60)/(sd(sub_galton$parent)/sqrt(length(sub_galton$parent)))
+pvalue = 2*pnorm(-abs(z))
+
+ci = 0.95
+z = qnorm((1-ci)/2)
+  
+se <- sd(sub_galton$parent) / sqrt(n) #SE = s/sqrt(n)
+  
+lower <- sub_galton.mean + z * se
+upper <- sub_galton.mean - z * se
+
+muactual = mean(galton$parent)
+s = sd(sub_galton$parent)
+  
+Zleft <- (lower-muactual)/(s/sqrt(n))
+Zright <-(upper-muactual)/(s/sqrt(n))
+b <- pnorm(Zright)-pnorm(Zleft)
+power = 1-b
+power
+```
+
+
+## <b> d. </b>
+```{r}
+n = 10
+sdf<- sample(1:nrow(galton), n)
+sub_galton <- galton[sdf,]
+
+t <- (mean(sub_galton$parent)-60)/(sd(sub_galton$parent)/sqrt(length(sub_galton$parent)))
+pvalue = 2*pt(-abs(z),df=n-1)
+
+ci = 0.95
+t = qnorm((1-ci)/2)
+  
+se <- sd(sub_galton$parent) / sqrt(n) #SE = s/sqrt(n)
+  
+lower <- sub_galton.mean + t * se
+upper <- sub_galton.mean - t * se
+
+muactual = mean(galton$parent)
+s = sd(sub_galton$parent)
+  
+Zleft <- (lower-muactual)/(s/sqrt(n))
+Zright <-(upper-muactual)/(s/sqrt(n))
+b <- pt(Zright, df = n-1)-pt(Zleft, df = n-1)
+
+power = 1-b
+power
+```
