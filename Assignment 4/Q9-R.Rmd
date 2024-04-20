@@ -1,0 +1,69 @@
+---
+title: "R Notebook"
+author: "Fatemeh Nadi"
+date: "Dec 2022"
+output: html_document
+---
+
+# 9 - (R)
+  
+
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(ggmosaic)
+library(tidyverse)
+theme_set(theme_minimal(20))
+
+```
+
+
+
+<b> read data </b>
+
+```{r}
+# Read CSV into DataFrame
+house = read.csv('./Houses.csv')
+head (house)
+```
+
+
+You should bootstrap the difference in means with 1000 samples and describe the
+bootstrap distribution.
+## <b> a. </b>
+```{r}
+bootstrap <- replicate (1000, sample (house$Area..Meter., replace=T))
+mean <-mean(bootstrap)
+SE <- sd(bootstrap)/sqrt (length (mean))
+
+```
+
+```{r}
+B = 1000
+n = nrow(house)
+boot.samples = matrix(sample(house$Area..Meter., size = B * n, replace = TRUE),B, n)
+boot.statistics = apply(boot.samples, 1, mean)
+
+require(ggplot2)
+ggplot(data.frame(meanprice = boot.statistics),aes(x=meanprice)) +
+geom_histogram(binwidth=2,aes(y=..density..)) +
+geom_density(color="red")
+```
+
+Using both the original and bootstrap samples, calculate the p-value and compare the
+results.
+## <b> b. </b>
+```{r}
+
+
+```
+
+
+Determine the 95% bootstrap percentile confidence interval for both the original sample
+and the bootstrap sample and compare the two.
+## <b> c. </b>
+```{r}
+
+```
+
